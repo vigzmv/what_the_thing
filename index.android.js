@@ -11,10 +11,15 @@ import {
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-var Clarifai = require('clarifai');
+// Loading my api keys from external file ./apiKeys.json
+
+const apiKeys = require('./apiKeys.json');
+
+const Clarifai = require('clarifai');
+
 var app = new Clarifai.App(
-    'NC_zCTITbajnUlNUJ8LrFMl4FH5tl-1Bl8nSp30p',
-    '1QoTBYaR8MDQRIr_rRHI3RDVvYeMyslkHtq7D9BY'
+    apiKeys.clarifaiID,
+    apiKeys.clarifaiSecret
 );
 
 export default class what_the_thing extends Component {
@@ -22,15 +27,16 @@ export default class what_the_thing extends Component {
     takePicture() {
         this.camera.capture()
             .then((image64) => {
-                console.log("cap");
                 app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
+
                     .then(function(response) {
-                        const concepts = (response.outputs[0].data.concepts.slice(0,3)).map(
-                            concept => ({name:concept.name, val: concept.value})
-                        );
+                        const concepts = (response.outputs[0].data.concepts.slice(0,3))
+                            .map(concept => ({name:concept.name, val: concept.value}));
+
                         console.table(concepts);
-                        alert(concepts);
-                        
+
+                        alert(`${concepts[0].name},${concepts[1].name},${concepts[2].name}`);
+
                     }, function(err) {
                         alert(err);
                     });
