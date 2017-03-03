@@ -8,11 +8,27 @@ import {
     TouchableOpacity,
     TouchableHighlight
 } from 'react-native';
+
+var Clarifai = require('clarifai');    
+var app = new Clarifai.App(
+    'NC_zCTITbajnUlNUJ8LrFMl4FH5tl-1Bl8nSp30p',
+    '1QoTBYaR8MDQRIr_rRHI3RDVvYeMyslkHtq7D9BY'
+);
+
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
-
 export default class what_the_thing extends Component {
+
+    takePicture() {
+        this.camera.capture()
+          .then((image64) => {
+
+          })
+          .catch(err => console.error(err));
+    }
+
+
 	render() {
         return (
             <View style={styles.container}>
@@ -27,7 +43,7 @@ export default class what_the_thing extends Component {
                 captureMode={Camera.constants.CaptureMode.still}
                 captureQuality={Camera.constants.CaptureQuality.high}
                 >
-                    <TouchableOpacity onPress={()=>alert(1)}>
+                    <TouchableOpacity onPress={this.takePicture.bind(this)}>
                         <View style={styles.cameraIco}>
                             <Icon name="camera" size={50} color="#E8EAF6" />
                         </View>
