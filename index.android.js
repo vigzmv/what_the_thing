@@ -12,7 +12,6 @@ import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 // Loading my api keys from external file ./apiKeys.json
-
 const apiKeys = require('./apiKeys.json');
 
 const Clarifai = require('clarifai');
@@ -57,12 +56,12 @@ export default class what_the_thing extends Component {
                 playSoundOnCapture={true}
                 captureMode={Camera.constants.CaptureMode.still}
                 captureTarget={Camera.constants.CaptureTarget.memory}
-                captureQuality={Camera.constants.CaptureQuality.high}
+                captureQuality={Camera.constants.CaptureQuality.low}
                 >
 
                     <TouchableOpacity onPress={this.takePicture.bind(this)}>
                         <View style={styles.cameraIco}>
-                            <Icon name="camera" size={50} color="#E8EAF6"/>
+                            <Icon name="question-circle-o" size={70} color="#E8EAF6"/>
                         </View>
                     </TouchableOpacity>
 
