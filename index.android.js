@@ -8,6 +8,7 @@ import {
     TouchableOpacity,
     TouchableHighlight
 } from 'react-native';
+
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
@@ -53,10 +54,10 @@ export default class what_the_thing extends Component {
                 style={styles.preview}
                 aspect={Camera.constants.Aspect.fill}
                 type={Camera.constants.Type.back}
-                playSoundOnCapture={true}
                 captureMode={Camera.constants.CaptureMode.still}
                 captureTarget={Camera.constants.CaptureTarget.memory}
                 captureQuality={Camera.constants.CaptureQuality.low}
+                playSoundOnCapture={true}
                 >
 
                     <TouchableOpacity style={styles.cameraIco} onPress={this.takePicture.bind(this)}>
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width
     },
     cameraIco: {
-        marginBottom: 50
+        marginBottom: 45
     }
 });
 
