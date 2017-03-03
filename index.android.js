@@ -59,8 +59,8 @@ export default class what_the_thing extends Component {
                 captureQuality={Camera.constants.CaptureQuality.low}
                 >
 
-                    <TouchableOpacity onPress={this.takePicture.bind(this)}>
-                        <View style={styles.cameraIco}>
+                    <TouchableOpacity style={styles.cameraIco} onPress={this.takePicture.bind(this)}>
+                        <View>
                             <Icon name="question-circle-o" size={70} color="#E8EAF6"/>
                         </View>
                     </TouchableOpacity>
