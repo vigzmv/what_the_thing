@@ -6,11 +6,14 @@ import {
     Text,
     View,
     TouchableOpacity,
-    TouchableHighlight
+    TouchableHighlight,
 } from 'react-native';
 
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
+import Modal from 'react-native-modalbox';
+import Spinner from 'react-native-loading-spinner-overlay';
+import Button from 'react-native-button';
 
 // Loading my api keys from external file ./apiKeys.json
 const apiKeys = require('./apiKeys.json');
@@ -19,23 +22,52 @@ const Clarifai = require('clarifai');
 
 var app = new Clarifai.App(
     apiKeys.clarifaiID,
-    apiKeys.clarifaiSecret
+    apiKeys.clarifaiSecret,
 );
 
 export default class what_the_thing extends Component {
 
+    constructor(props) {
+    super();
+    this.state = {
+        visible: false,
+        concepts: [],
+        lnconcepts: [],
+        isOpen: false,
+        isDisabled: false,
+        swipeToClose: true,
+        };
+
+        this.toggleLoader = this.toggleLoader.bind(this);
+        this.setTextContent = this.setTextContent.bind(this);
+    }
+
+    toggleLoader() {
+        this.setState({
+            visible: !this.state.visible
+        });
+    }
+
+    setTextContent(concepts) {
+        this.toggleLoader();
+        this.setState({
+            concepts: concepts,
+        });
+    }
+
     takePicture() {
+        const self = this;
+        self.toggleLoader();
         this.camera.capture()
             .then((image64) => {
                 app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
+                .then(function(response) {
+                    const concepts = (response.outputs[0].data.concepts.slice(0,5))
+                    .map(concept => ({name:concept.name, val: concept.value}));
 
-                    .then(function(response) {
-                        const concepts = (response.outputs[0].data.concepts.slice(0,3))
-                            .map(concept => ({name:concept.name, val: concept.value}));
-
-                        console.table(concepts);
-
-                        alert(`${concepts[0].name},${concepts[1].name},${concepts[2].name}`);
+                    self.setTextContent(concepts);
+                    console.table(concepts);
+                    alert(concepts[0][0]);
 
                     }, function(err) {
                         alert(err);
@@ -59,6 +91,20 @@ export default class what_the_thing extends Component {
                 captureQuality={Camera.constants.CaptureQuality.low}
                 playSoundOnCapture={true}
                 >
+                    <View style={styles.Concept}>
+                        <Text style={styles.enConceptText}>
+                        </Text>
+                    </View>
+
+                    <View style={styles.Concept}>
+                        <Text style={styles.lnConceptText}>
+                        </Text>
+                    </View>
+
+                    <View style={{ flex: 1 }}>
+                        <Spinner visible={this.state.visible}
+                            extContent={''} textStyle={{color: '#FFF', fontSize: 30}} />
+                    </View>
 
                     <TouchableOpacity style={styles.cameraIco} onPress={this.takePicture.bind(this)}>
                         <View>
@@ -84,7 +130,21 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width
     },
     cameraIco: {
-        marginBottom: 45
+        bottom: 65,
+    },
+    Concept: {
+        flex: 1,
+        top: Dimensions.get('window').height/4,
+        alignItems: 'center',
+    },
+    enConceptText: {
+        fontSize: 35,
+        color: 'white',
+    },
+    lnConceptText: {
+        bottom: -40,
+        fontSize: 35,
+        color: 'white',
     }
 });
 

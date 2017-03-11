@@ -3040,9 +3040,21 @@ react-deep-force-update@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-1.0.1.tgz#f911b5be1d2a6fe387507dd6e9a767aa2924b4c7"
 
+react-native-button@^1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/react-native-button/-/react-native-button-1.8.2.tgz#49e5cadd22ee443adea52a85539d288aa2117ade"
+
 "react-native-camera@git+https://github.com/lwansbrough/react-native-camera.git":
   version "0.6.0"
   resolved "git+https://github.com/lwansbrough/react-native-camera.git#c688c8344cfefdc9c39f3266a2b46d061d4e8ee8"
+
+react-native-loading-spinner-overlay@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/react-native-loading-spinner-overlay/-/react-native-loading-spinner-overlay-0.4.2.tgz#a906d781a0fcecf793491d800d2f5b3eeadf7c3b"
+
+react-native-modalbox@^1.3.9:
+  version "1.3.9"
+  resolved "https://registry.yarnpkg.com/react-native-modalbox/-/react-native-modalbox-1.3.9.tgz#9991c51ebc69c720d8a778aaa47c89137ddea111"
 
 react-native-vector-icons@^4.0.0:
   version "4.0.0"
