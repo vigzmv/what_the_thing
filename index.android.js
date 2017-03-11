@@ -31,8 +31,8 @@ export default class what_the_thing extends Component {
     super();
     this.state = {
         visible: false,
-        concepts: [],
-        lnconcepts: [],
+        concepts: '',
+        lnconcepts: '',
         isOpen: false,
         isDisabled: false,
         swipeToClose: true,
@@ -40,6 +40,8 @@ export default class what_the_thing extends Component {
 
         this.toggleLoader = this.toggleLoader.bind(this);
         this.setTextContent = this.setTextContent.bind(this);
+        this.loadConcept = this.loadConcept.bind(this);
+        this.emptyState = this.emptyState.bind(this);
     }
 
     toggleLoader() {
@@ -48,34 +50,52 @@ export default class what_the_thing extends Component {
         });
     }
 
-    setTextContent(concepts) {
-        this.toggleLoader();
+    emptyState() {
         this.setState({
-            concepts: concepts,
+            concepts: '',
+            lnconcepts: '',
         });
     }
 
-    takePicture() {
-        const self = this;
-        self.toggleLoader();
-        this.camera.capture()
-            .then((image64) => {
-                app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
-                .then(function(response) {
-                    const concepts = (response.outputs[0].data.concepts.slice(0,5))
-                    .map(concept => ({name:concept.name, val: concept.value}));
-
-                    self.setTextContent(concepts);
-                    console.table(concepts);
-                    alert(concepts[0][0]);
-
-                    }, function(err) {
-                        alert(err);
-                    });
-            })
-            .catch(err => alert(err));
+    setTextContent(concepts) {
+        this.setState({
+            concepts: concepts,
+        });
+        this.toggleLoader();
     }
 
+    loadConcept() {
+        const concept = this.state.concepts;
+
+        if(concept!='')
+        return concept[0]['name'];
+
+        else return ''
+    }
+
+    takePicture() {
+
+        const self = this;
+        self.toggleLoader();
+        self.emptyState();
+        setTimeout(() => {
+            this.camera.capture()
+                .then((image64) => {
+                    app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
+                    .then(function(response) {
+                        const concepts = (response.outputs[0].data.concepts.slice(0,5))
+                        .map(concept => ({name:concept.name, val: concept.value}));
+
+                        self.setTextContent(concepts);
+                        console.table(concepts);
+
+                        }, function(err) {
+                            alert(err);
+                        });
+                })
+                .catch(err => alert(err));
+        },50);
+    }
     render() {
         return (
             <View style={styles.container}>
@@ -93,20 +113,23 @@ export default class what_the_thing extends Component {
                 >
                     <View style={styles.Concept}>
                         <Text style={styles.enConceptText}>
+
                         </Text>
                     </View>
 
                     <View style={styles.Concept}>
                         <Text style={styles.lnConceptText}>
+                            {this.loadConcept()}
                         </Text>
                     </View>
 
                     <View style={{ flex: 1 }}>
-                        <Spinner visible={this.state.visible}
-                            extContent={''} textStyle={{color: '#FFF', fontSize: 30}} />
+                        <Spinner size='large' visible={this.state.visible} />
                     </View>
 
-                    <TouchableOpacity style={styles.cameraIco} onPress={this.takePicture.bind(this)}>
+                    <TouchableOpacity
+                        style={[styles.cameraIco, {height:this.state.visible?0:65}]}
+                        onPress={this.takePicture.bind(this)}>
                         <View>
                             <Icon name="question-circle-o" size={70} color="#E8EAF6"/>
                         </View>

@@ -1,4 +1,8 @@
 {
+    "clarifaiID": "NC_zCTITbajnUlNUJ8LrFMl4FH5tl-1Bl8nSp30p",
+    "clarifaiSecret": "1QoTBYaR8MDQRIr_rRHI3RDVvYeMyslkHtq7D9BY"
+}
+/*{
     "clarifaiID": "your Clarifai app ID",
     "clarifaiSecret": "your Clarifai app secret"
-}
+}*/
