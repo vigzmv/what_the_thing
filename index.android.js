@@ -140,6 +140,19 @@ export default class what_the_thing extends Component {
                 captureQuality={Camera.constants.CaptureQuality.low}
                 playSoundOnCapture={true}
                 >
+                    <View style={[styles.topIcons, {height:this.state.loadingVisible?0:65}]}>
+                        <View style={[styles.info]}>
+                            <TouchableOpacity>
+                                <Icon name="question-circle-o" size={50} color="#E8EAF6"/>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={[styles.lang]}>
+                            <TouchableOpacity>
+                                <Icon name="gear" size={50} color="#E8EAF6"/>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+
                     <View style={styles.Concept}>
                         <Text style={styles.enConceptText}>
                             {this.loadLnConcept()}
@@ -157,10 +170,10 @@ export default class what_the_thing extends Component {
                     </View>
 
                     <TouchableOpacity
-                        style={[styles.cameraIco, {height:this.state.loadingVisible?0:65}]}
+                        style={[styles.cameraIco, {height:this.state.loadingVisible?0:66}]}
                         onPress={this.takePicture.bind(this)}>
                         <View>
-                            <Icon name="question-circle-o" size={70} color="#E8EAF6"/>
+                            <Icon name="eercast" size={65} color="#E8EAF6"/>
                         </View>
                     </TouchableOpacity>
 
@@ -172,27 +185,50 @@ export default class what_the_thing extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
     },
+
     preview: {
         flex: 1,
         justifyContent: 'flex-end',
         alignItems: 'center',
         height: Dimensions.get('window').height,
-        width: Dimensions.get('window').width
+        width: Dimensions.get('window').width,
     },
+
     cameraIco: {
-        bottom: 65,
+        bottom: 20,
     },
+
+    topIcons: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        top: 10,
+    },
+
+    info: {
+        flex: 1,
+        left: 10,
+        alignItems: 'flex-start',
+    },
+
+    lang: {
+        flex: 1,
+        right: 10,
+        alignItems: 'flex-end',
+    },
+
     Concept: {
         flex: 1,
         top: Dimensions.get('window').height/4,
         alignItems: 'center',
     },
+
     enConceptText: {
         fontSize: 35,
         color: 'white',
     },
+
     lnConceptText: {
         bottom: -40,
         fontSize: 35,
