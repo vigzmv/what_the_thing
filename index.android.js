@@ -17,6 +17,10 @@ import Button from 'react-native-button';
 
 // Loading my api keys from external file ./apiKeys.json
 const apiKeys = require('./apiKeys.json');
+const yandexKey = apiKeys.yandexTranslateKey;
+
+const yandexGetLang = `https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=${yandexKey}&ui=en`
+const yandexGetTranslate = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${yandexKey}`
 
 const Clarifai = require('clarifai');
 
@@ -28,11 +32,13 @@ var app = new Clarifai.App(
 export default class what_the_thing extends Component {
 
     constructor(props) {
+
     super();
     this.state = {
-        visible: false,
+        loadingVisible: false,
         concepts: '',
-        lnconcepts: '',
+        lnconcept: '',
+        lang: 'hi',
         isOpen: false,
         isDisabled: false,
         swipeToClose: true,
@@ -42,18 +48,20 @@ export default class what_the_thing extends Component {
         this.setTextContent = this.setTextContent.bind(this);
         this.loadConcept = this.loadConcept.bind(this);
         this.emptyState = this.emptyState.bind(this);
+        this.translateConcept = this.translateConcept.bind(this);
+        this.loadLnConcept = this.loadLnConcept.bind(this);
     }
 
     toggleLoader() {
         this.setState({
-            visible: !this.state.visible
+            loadingVisible: !this.state.loadingVisible
         });
     }
 
     emptyState() {
         this.setState({
             concepts: '',
-            lnconcepts: '',
+            lnconcept: '',
         });
     }
 
@@ -61,16 +69,32 @@ export default class what_the_thing extends Component {
         this.setState({
             concepts: concepts,
         });
-        this.toggleLoader();
     }
 
     loadConcept() {
         const concept = this.state.concepts;
 
         if(concept!='')
-        return concept[0]['name'];
+            return concept[0]['name'];
+        else
+            return ''
+    }
 
-        else return ''
+    loadLnConcept() {
+        return this.state.lnconcept;
+    }
+
+    translateConcept(concept) {
+
+        fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.lang}`)
+        .then(res => res.json())
+        .then(data => {
+            this.setState({
+                lnconcept: data.text[0]
+            })
+            this.toggleLoader();
+        })
+        .catch(err => console.log(err));
     }
 
     takePicture() {
@@ -78,6 +102,7 @@ export default class what_the_thing extends Component {
         const self = this;
         self.toggleLoader();
         self.emptyState();
+
         setTimeout(() => {
             this.camera.capture()
                 .then((image64) => {
@@ -86,7 +111,12 @@ export default class what_the_thing extends Component {
                         const concepts = (response.outputs[0].data.concepts.slice(0,5))
                         .map(concept => ({name:concept.name, val: concept.value}));
 
+                        //TODO: gota cleanup concepts first
+
+                        conceptToTanslate = concepts[0]['name'];
+                        self.translateConcept(conceptToTanslate);
                         self.setTextContent(concepts);
+
                         console.table(concepts);
 
                         }, function(err) {
@@ -102,7 +132,6 @@ export default class what_the_thing extends Component {
                 <Camera ref={(cam) => {
                     this.camera = cam;
                 }}
-
                 style={styles.preview}
                 aspect={Camera.constants.Aspect.fill}
                 type={Camera.constants.Type.back}
@@ -113,7 +142,7 @@ export default class what_the_thing extends Component {
                 >
                     <View style={styles.Concept}>
                         <Text style={styles.enConceptText}>
-
+                            {this.loadLnConcept()}
                         </Text>
                     </View>
 
@@ -124,11 +153,11 @@ export default class what_the_thing extends Component {
                     </View>
 
                     <View style={{ flex: 1 }}>
-                        <Spinner size='large' visible={this.state.visible} />
+                        <Spinner size='large' visible={this.state.loadingVisible} />
                     </View>
 
                     <TouchableOpacity
-                        style={[styles.cameraIco, {height:this.state.visible?0:65}]}
+                        style={[styles.cameraIco, {height:this.state.loadingVisible?0:65}]}
                         onPress={this.takePicture.bind(this)}>
                         <View>
                             <Icon name="question-circle-o" size={70} color="#E8EAF6"/>
