@@ -7,6 +7,7 @@ import {
     View,
     TouchableOpacity,
     TouchableHighlight,
+    ScrollView,
 } from 'react-native';
 
 import Camera from 'react-native-camera';
@@ -41,7 +42,7 @@ export default class what_the_thing extends Component {
         lang: 'hi',
         isOpen: false,
         isDisabled: false,
-        swipeToClose: true,
+        swipeToClose: false,
         };
 
         this.toggleLoader = this.toggleLoader.bind(this);
@@ -50,6 +51,7 @@ export default class what_the_thing extends Component {
         this.emptyState = this.emptyState.bind(this);
         this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
+        this.langList = this.langList.bind(this);
     }
 
     toggleLoader() {
@@ -63,6 +65,14 @@ export default class what_the_thing extends Component {
             concepts: '',
             lnconcept: '',
         });
+    }
+
+    langList(){
+        list = []
+        for (var i=0;i<50;i++) {
+            list.push(<Text key={i}>Elem {i}</Text>);
+        }
+        return list;
     }
 
     setTextContent(concepts) {
@@ -147,11 +157,27 @@ export default class what_the_thing extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.lang]}>
-                            <TouchableOpacity>
+                            <TouchableOpacity onPress={() => this.refs.langs.open()}>
                                 <Icon name="gear" size={50} color="#E8EAF6"/>
                             </TouchableOpacity>
                         </View>
                     </View>
+
+                    <Modal
+                        style={[styles.modal, styles.langs]}
+                        position={"center"}
+                        ref={"langs"}
+                        isDisabled={this.state.isDisabled}
+                        swipeToClose={this.state.swipeToClose}
+                        onClosed={this.onLangClose}
+                        onOpened={this.onLangOpen}
+                        >
+                            <ScrollView style={styles.langList}>
+                                <View>
+                                  {this.langList()}
+                                </View>
+                            </ScrollView>
+                    </Modal>
 
                     <View style={styles.Concept}>
                         <Text style={styles.enConceptText}>
@@ -197,7 +223,7 @@ const styles = StyleSheet.create({
     },
 
     cameraIco: {
-        bottom: 20,
+        bottom: 30,
     },
 
     topIcons: {
@@ -208,14 +234,29 @@ const styles = StyleSheet.create({
 
     info: {
         flex: 1,
-        left: 10,
+        left: 12,
         alignItems: 'flex-start',
     },
 
     lang: {
         flex: 1,
-        right: 10,
+        right: 12,
         alignItems: 'flex-end',
+    },
+
+    modal: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    langs: {
+        top: -20,
+        height: Dimensions.get('window').height - 160,
+        width: Dimensions.get('window').width - 60,
+    },
+
+    langList: {
+        width: 300,
     },
 
     Concept: {
