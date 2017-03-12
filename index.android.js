@@ -33,13 +33,14 @@ var app = new Clarifai.App(
 export default class what_the_thing extends Component {
 
     constructor(props) {
-
     super();
+
     this.state = {
         loadingVisible: false,
         concepts: '',
         lnconcept: '',
         lang: 'hi',
+        langsList: '',
         isOpen: false,
         isDisabled: false,
         swipeToClose: false,
@@ -52,6 +53,11 @@ export default class what_the_thing extends Component {
         this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
         this.langList = this.langList.bind(this);
+
+    }
+
+    componentWillMount() {
+        this.langList();
     }
 
     toggleLoader() {
@@ -67,12 +73,25 @@ export default class what_the_thing extends Component {
         });
     }
 
-    langList(){
-        list = []
-        for (var i=0;i<50;i++) {
-            list.push(<Text key={i}>Elem {i}</Text>);
-        }
-        return list;
+    langList() {
+
+        fetch(yandexGetLang)
+        .then(res => res.json())
+        .then(data => {
+            const langsList = data.langs;
+            console.log(langsList);
+            let list = [];
+            for (var key in langsList) {
+                if (langsList.hasOwnProperty(key)) {
+                    list.push(<Text style={styles.text} key={key}>{langsList[key]} - {key}</Text>);
+                }
+            }
+            console.log(list);
+            this.setState({
+                langsList: list
+            });
+        })
+        .catch(err => console.log(err));
     }
 
     setTextContent(concepts) {
@@ -136,6 +155,7 @@ export default class what_the_thing extends Component {
                 .catch(err => alert(err));
         },50);
     }
+
     render() {
         return (
             <View style={styles.container}>
@@ -174,7 +194,7 @@ export default class what_the_thing extends Component {
                         >
                             <ScrollView style={styles.langList}>
                                 <View>
-                                  {this.langList()}
+                                    {this.state.langsList}
                                 </View>
                             </ScrollView>
                     </Modal>
@@ -210,6 +230,7 @@ export default class what_the_thing extends Component {
 }
 
 const styles = StyleSheet.create({
+
     container: {
         flex: 1,
     },
