@@ -8,12 +8,12 @@ import {
     TouchableOpacity,
     TouchableHighlight,
     ScrollView,
+    ActivityIndicator,
 } from 'react-native';
 
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modalbox';
-import Spinner from 'react-native-loading-spinner-overlay';
 import Button from 'react-native-button';
 var StatusBarAndroid = require('react-native-android-statusbar');
 
@@ -82,14 +82,14 @@ export default class what_the_thing extends Component {
         .then(res => res.json())
         .then(data => {
             const langsList = data.langs;
-            console.log(langsList);
+            // console.log(langsList);
             let list = [];
             for (var key in langsList) {
                 if (langsList.hasOwnProperty(key)) {
                     list.push(<Text style={styles.text} key={key}>{langsList[key]} - {key}</Text>);
                 }
             }
-            console.log(list);
+            // console.log(list);
             this.setState({
                 langsList: list
             });
@@ -133,11 +133,10 @@ export default class what_the_thing extends Component {
 
         const self = this;
         self.emptyState();
+        self.toggleLoader();
 
         this.camera.capture()
             .then((image64) => {
-                self.toggleLoader();
-
                 app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
                 .then(function(response) {
                     const concepts = (response.outputs[0].data.concepts.slice(0,5))
@@ -149,7 +148,7 @@ export default class what_the_thing extends Component {
                     self.translateConcept(conceptToTanslate);
                     self.setTextContent(concepts);
 
-                    console.table(concepts);
+                    // console.table(concepts);
 
                     }, function(err) {
                         alert(err);
@@ -172,15 +171,19 @@ export default class what_the_thing extends Component {
                 captureQuality={Camera.constants.CaptureQuality.low}
                 playSoundOnCapture={true}
                 >
-                    <View style={[styles.topIcons, {height:this.state.loadingVisible?0:65}]}>
+                    <View style={[styles.topIcons,]}>
                         <View style={[styles.info]}>
                             <TouchableOpacity>
-                                <Icon name="question-circle-o" size={50} color="#E8EAF6"/>
+                                <Icon name="question-circle-o" size={50}
+                                color={this.state.loadingVisible?"#00000000":"#E8EAF6"}
+                            />
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.lang]}>
                             <TouchableOpacity onPress={() => this.refs.langs.open()}>
-                                <Icon name="gear" size={50} color="#E8EAF6"/>
+                                <Icon name="gear" size={50}
+                                color={this.state.loadingVisible?"#00000000":"#E8EAF6"}
+                            />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -207,23 +210,32 @@ export default class what_the_thing extends Component {
                         </Text>
                     </View>
 
+                    <View style={[{ flex: 1 },]}>
+                        <ActivityIndicator
+                            animating={this.state.loadingVisible}
+                            style={[styles.activityIcon,]}
+                            size="large"
+                            // color="white"
+                        />
+                    </View>
+
                     <View style={styles.Concept}>
                         <Text style={styles.lnConceptText}>
                             {this.loadConcept()}
                         </Text>
                     </View>
 
-                    <View style={{ flex: 1 }}>
-                        <Spinner size='large' visible={this.state.loadingVisible} />
+                    <View style={[{height:70}]}>
+                        <TouchableOpacity
+                            style={[styles.cameraIco,{height:this.state.loadingVisible?0:70}]}
+                            onPress={this.takePicture.bind(this)}>
+                            <View>
+                                <Icon name="eercast" size={70}
+                                color={this.state.loadingVisible?"#00000000":"#E8EAF6"}
+                                />
+                            </View>
+                        </TouchableOpacity>
                     </View>
-
-                    <TouchableOpacity
-                        style={[styles.cameraIco, {height:this.state.loadingVisible?0:66}]}
-                        onPress={this.takePicture.bind(this)}>
-                        <View>
-                            <Icon name="eercast" size={65} color="#E8EAF6"/>
-                        </View>
-                    </TouchableOpacity>
 
                 </Camera>
             </View>
@@ -235,6 +247,12 @@ const styles = StyleSheet.create({
 
     container: {
         flex: 1,
+    },
+
+    activityIcon: {
+        alignItems: 'center',
+        justifyContent: 'center',
+        top: Dimensions.get('window').height/8,
     },
 
     preview: {
@@ -252,7 +270,7 @@ const styles = StyleSheet.create({
     topIcons: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        top: 10,
+        top: 12,
     },
 
     info: {
@@ -284,17 +302,18 @@ const styles = StyleSheet.create({
 
     Concept: {
         flex: 1,
-        top: Dimensions.get('window').height/4,
+        top: Dimensions.get('window').height/7,
         alignItems: 'center',
     },
 
     enConceptText: {
         fontSize: 35,
         color: 'white',
+        top: 0,
     },
 
     lnConceptText: {
-        bottom: -40,
+        bottom: Dimensions.get('window').height/8,
         fontSize: 35,
         color: 'white',
     }
