@@ -1,4 +1,6 @@
 package com.what_the_thing;
+import com.facebook.react.ReactActivity;
+import me.neo.react.StatusBarPackage; // <--- import
 
 import android.app.Application;
 import android.util.Log;
@@ -26,9 +28,10 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage(),
-            new VectorIconsPackage(),
-            new RCTCameraPackage()
+        new MainReactPackage(),
+        new VectorIconsPackage(),
+        new RCTCameraPackage(),
+        new StatusBarPackage()
       );
     }
   };

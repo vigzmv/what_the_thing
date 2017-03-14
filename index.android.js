@@ -15,6 +15,7 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modalbox';
 import Spinner from 'react-native-loading-spinner-overlay';
 import Button from 'react-native-button';
+var StatusBarAndroid = require('react-native-android-statusbar');
 
 // Loading my api keys from external file ./apiKeys.json
 const apiKeys = require('./apiKeys.json');
@@ -53,17 +54,19 @@ export default class what_the_thing extends Component {
         this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
         this.langList = this.langList.bind(this);
-
     }
 
     componentWillMount() {
         this.langList();
+        // StatusBarAndroid.hideStatusBar();
+        StatusBarAndroid.setHexColor('grey');
     }
 
     toggleLoader() {
         this.setState({
             loadingVisible: !this.state.loadingVisible
         });
+        // StatusBarAndroid.hideStatusBar();
     }
 
     emptyState() {
@@ -129,31 +132,30 @@ export default class what_the_thing extends Component {
     takePicture() {
 
         const self = this;
-        self.toggleLoader();
         self.emptyState();
 
-        setTimeout(() => {
-            this.camera.capture()
-                .then((image64) => {
-                    app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
-                    .then(function(response) {
-                        const concepts = (response.outputs[0].data.concepts.slice(0,5))
-                        .map(concept => ({name:concept.name, val: concept.value}));
+        this.camera.capture()
+            .then((image64) => {
+                self.toggleLoader();
 
-                        //TODO: gota cleanup concepts first
+                app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
+                .then(function(response) {
+                    const concepts = (response.outputs[0].data.concepts.slice(0,5))
+                    .map(concept => ({name:concept.name, val: concept.value}));
 
-                        conceptToTanslate = concepts[0]['name'];
-                        self.translateConcept(conceptToTanslate);
-                        self.setTextContent(concepts);
+                    //TODO: gota cleanup concepts first
 
-                        console.table(concepts);
+                    conceptToTanslate = concepts[0]['name'];
+                    self.translateConcept(conceptToTanslate);
+                    self.setTextContent(concepts);
 
-                        }, function(err) {
-                            alert(err);
-                        });
-                })
-                .catch(err => alert(err));
-        },50);
+                    console.table(concepts);
+
+                    }, function(err) {
+                        alert(err);
+                    });
+            })
+            .catch(err => alert(err));
     }
 
     render() {
