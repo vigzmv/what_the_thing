@@ -95,7 +95,10 @@ export default class what_the_thing extends Component {
             let list = [];
             for (var key in langsList) {
                 if (langsList.hasOwnProperty(key)) {
-                    list.push(<Text style={styles.text} key={key}>{langsList[key]} - {key}</Text>);
+                    list.push(<View style={styles.listBoxes}  key={key}>
+                        <Text style={styles.list} key={key}>{langsList[key]} - {key}</Text>
+                    </View>
+                    );
                 }
             }
             // console.log(list);
@@ -235,7 +238,7 @@ export default class what_the_thing extends Component {
                         onOpened={this.onLangOpen}
                         >
                             <ScrollView style={styles.langList}>
-                                <View>
+                                <View style={styles.langListView}>
                                     {this.state.langsList}
                                 </View>
                             </ScrollView>
@@ -261,7 +264,7 @@ export default class what_the_thing extends Component {
                             {this.loadConcept()}
                         </Text>
                     </View>
-                    <View style={{top: Dimensions.get('window').height/25}}>
+                    <View style={{top: 18}}>
                         <Text style={[styles.lnConceptText,]}>
                             <Text style={{fontSize:14}}> {this.loadOtherConcept()}</Text>
                         </Text>
@@ -294,7 +297,7 @@ const styles = StyleSheet.create({
     activityIcon: {
         alignItems: 'center',
         justifyContent: 'center',
-        top: Dimensions.get('window').height/8,
+        top: Dimensions.get('window').height/7,
     },
 
     preview: {
@@ -334,12 +337,34 @@ const styles = StyleSheet.create({
 
     langs: {
         top: -20,
-        height: Dimensions.get('window').height - 160,
-        width: Dimensions.get('window').width - 60,
+        height: Dimensions.get('window').height - 190,
+        width: Dimensions.get('window').width - 90,
+    },
+
+    langListView: {
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 
     langList: {
-        width: 300,
+        width: Dimensions.get('window').width - 90,
+        // paddingLeft: 50,
+        paddingTop: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: 'grey',
+    },
+
+    listBoxes: {
+        borderBottomWidth: 1,
+        borderBottomColor: '#CFD8DC',
+        width: Dimensions.get('window').width - 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    list: {
+        fontSize: 30,
+        paddingTop: 10,
     },
 
     Concept: {
@@ -349,7 +374,7 @@ const styles = StyleSheet.create({
     },
 
     enConceptText: {
-        fontSize: 35,
+        fontSize: 40,
         color: 'white',
         top: 0,
     },
