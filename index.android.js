@@ -31,6 +31,9 @@ var app = new Clarifai.App(
     apiKeys.clarifaiSecret,
 );
 
+const whiteColor = '#E8EAF6CC';
+const transparent = '#00000000';
+
 export default class what_the_thing extends Component {
 
     constructor(props) {
@@ -54,13 +57,17 @@ export default class what_the_thing extends Component {
         this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
         this.langList = this.langList.bind(this);
+        this.conceptCleanup = this.conceptCleanup.bind(this);
+        this.loadOtherConcept = this.loadOtherConcept.bind(this);
     }
+
 
     componentWillMount() {
         this.langList();
         // StatusBarAndroid.hideStatusBar();
         StatusBarAndroid.setHexColor('grey');
     }
+
 
     toggleLoader() {
         this.setState({
@@ -69,12 +76,14 @@ export default class what_the_thing extends Component {
         // StatusBarAndroid.hideStatusBar();
     }
 
+
     emptyState() {
         this.setState({
             concepts: '',
             lnconcept: '',
         });
     }
+
 
     langList() {
 
@@ -97,17 +106,31 @@ export default class what_the_thing extends Component {
         .catch(err => console.log(err));
     }
 
+
     setTextContent(concepts) {
         this.setState({
             concepts: concepts,
         });
     }
 
+
     loadConcept() {
         const concept = this.state.concepts;
 
         if(concept!='')
-            return concept[0]['name'];
+            return (<Text> {concept[0]['name']}{'\n'}</Text>);
+        else
+            return ''
+    }
+
+
+    loadOtherConcept() {
+        const C = this.state.concepts;
+
+        if(C!='')
+            return (
+                `${C[1]['name']}: ${C[1]['val']}, ${C[2]['name']}: ${C[2]['val']}, ${C[3]['name']}: ${C[3]['val']}`
+            );
         else
             return ''
     }
@@ -115,6 +138,7 @@ export default class what_the_thing extends Component {
     loadLnConcept() {
         return this.state.lnconcept;
     }
+
 
     translateConcept(concept) {
 
@@ -129,6 +153,18 @@ export default class what_the_thing extends Component {
         .catch(err => console.log(err));
     }
 
+
+    conceptCleanup(concepts) {
+        return concepts.map((concept) => {
+            concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
+            if(!(concept.name.startsWith('no ')))
+                return ({name:concept.name, val: concept.val});
+            }
+        )
+    }
+
+
+
     takePicture() {
 
         const self = this;
@@ -139,16 +175,16 @@ export default class what_the_thing extends Component {
             .then((image64) => {
                 app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
                 .then(function(response) {
-                    const concepts = (response.outputs[0].data.concepts.slice(0,5))
+                    const concepts = (response.outputs[0].data.concepts.slice(0,10))
                     .map(concept => ({name:concept.name, val: concept.value}));
 
+                    console.table(concepts);
                     //TODO: gota cleanup concepts first
-
-                    conceptToTanslate = concepts[0]['name'];
+                    const cleanConcept = self.conceptCleanup(concepts);
+                    console.table(cleanConcept);
+                    conceptToTanslate = cleanConcept[0]['name'];
                     self.translateConcept(conceptToTanslate);
                     self.setTextContent(concepts);
-
-                    // console.table(concepts);
 
                     }, function(err) {
                         alert(err);
@@ -156,6 +192,7 @@ export default class what_the_thing extends Component {
             })
             .catch(err => alert(err));
     }
+
 
     render() {
         return (
@@ -175,14 +212,14 @@ export default class what_the_thing extends Component {
                         <View style={[styles.info]}>
                             <TouchableOpacity>
                                 <Icon name="question-circle-o" size={50}
-                                color={this.state.loadingVisible?"#00000000":"#E8EAF6"}
+                                color={this.state.loadingVisible?transparent:whiteColor}
                             />
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.lang]}>
                             <TouchableOpacity onPress={() => this.refs.langs.open()}>
                                 <Icon name="gear" size={50}
-                                color={this.state.loadingVisible?"#00000000":"#E8EAF6"}
+                                color={this.state.loadingVisible?transparent:whiteColor}
                             />
                             </TouchableOpacity>
                         </View>
@@ -224,14 +261,19 @@ export default class what_the_thing extends Component {
                             {this.loadConcept()}
                         </Text>
                     </View>
+                    <View style={{top: Dimensions.get('window').height/25}}>
+                        <Text style={[styles.lnConceptText,]}>
+                            <Text style={{fontSize:14}}> {this.loadOtherConcept()}</Text>
+                        </Text>
+                    </View>
 
                     <View style={[{height:70}]}>
                         <TouchableOpacity
-                            style={[styles.cameraIco,{height:this.state.loadingVisible?0:70}]}
+                            style={[styles.cameraIco,{height:this.state.loadingVisible?0:72}]}
                             onPress={this.takePicture.bind(this)}>
                             <View>
                                 <Icon name="eercast" size={70}
-                                color={this.state.loadingVisible?"#00000000":"#E8EAF6"}
+                                color={this.state.loadingVisible?transparent:whiteColor}
                                 />
                             </View>
                         </TouchableOpacity>
@@ -264,13 +306,13 @@ const styles = StyleSheet.create({
     },
 
     cameraIco: {
-        bottom: 30,
+        bottom: 20,
     },
 
     topIcons: {
         flexDirection: 'row',
         justifyContent: 'space-around',
-        top: 12,
+        top: 10,
     },
 
     info: {
@@ -302,7 +344,7 @@ const styles = StyleSheet.create({
 
     Concept: {
         flex: 1,
-        top: Dimensions.get('window').height/7,
+        top: Dimensions.get('window').height/5.5,
         alignItems: 'center',
     },
 
