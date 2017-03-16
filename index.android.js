@@ -101,10 +101,7 @@ export default class what_the_thing extends Component {
                 list.push(<View style={styles.listBoxes} key={key}>
                     <TouchableOpacity
                         onPress={this.setLang.bind(this, key)}>
-                        <Text
-                            style={[styles.list, {color:this.state.lang == key?`#1b1b1b`:'#777777'}]}
-                            key={key}
-                            >
+                        <Text style={styles.list} key={key}>
                             {langsList[key]}
                         </Text>
                     </TouchableOpacity>
@@ -125,6 +122,7 @@ export default class what_the_thing extends Component {
         .then(res => res.json())
         .then(data => {
             this.setState({langs: data.langs });
+            this.setlanglist();
         })
         .catch(err => console.log(err));
     }
@@ -240,7 +238,7 @@ export default class what_the_thing extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.lang]}>
-                            <TouchableOpacity onPress={() => {this.refs.langs.open(); this.setlanglist();}}>
+                            <TouchableOpacity onPress={() => {this.toggleLoader(); this.refs.langs.open();}}>
                                 <Icon name="gear" size={50}
                                 color={this.state.loadingVisible?transparent:whiteColor}
                             />
@@ -287,14 +285,16 @@ export default class what_the_thing extends Component {
                         </TouchableOpacity>
                     </View>
 
+                    {/* TODO: optimize modal */}
+
                     <Modal
                         style={[styles.modal, styles.langs]}
                         position={"center"}
                         ref={"langs"}
-                        isDisabled={this.state.isDisabled}
+                        // isDisabled={this.state.isDisabled}
                         swipeToClose={this.state.swipeToClose}
-                        onClosed={this.onLangClose}
-                        onOpened={this.onLangOpen}
+                        // onOpened={this.onLangOpen}
+                        onClosed={this.toggleLoader}
                         >
                             <ScrollView style={styles.langList}>
                                 <View style={styles.langListView}>
@@ -357,8 +357,7 @@ const styles = StyleSheet.create({
     },
 
     langs: {
-        top: -20,
-        height: Dimensions.get('window').height - 190,
+        height: Dimensions.get('window').height - 120,
         width: Dimensions.get('window').width - 80,
         paddingBottom: 10,
     },
