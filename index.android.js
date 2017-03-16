@@ -215,7 +215,7 @@ export default class what_the_thing extends Component {
                             />
                             </TouchableOpacity>
                         </View>
-                        <View style={[styles.lang]}>
+                        <View style={[styles.gear]}>
                             <TouchableOpacity onPress={() => {this.toggleLoader(); this.refs.langs.open();}}>
                                 <Icon name="gear" size={50}
                                 color={this.state.loadingVisible?transparent:whiteColor}
@@ -331,7 +331,7 @@ const styles = StyleSheet.create({
         alignItems: 'flex-start',
     },
 
-    lang: {
+    gear: {
         flex: 1,
         right: 12,
         alignItems: 'flex-end',
@@ -340,6 +340,7 @@ const styles = StyleSheet.create({
     modal: {
         justifyContent: 'center',
         alignItems: 'center',
+        paddingTop: 8,
     },
 
     langs: {
@@ -348,29 +349,17 @@ const styles = StyleSheet.create({
         paddingBottom: 10,
     },
 
-    langListView: {
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-
-    langList: {
-        width: Dimensions.get('window').width - 80,
-        // paddingLeft: 50,
-        paddingTop: 4,
-        paddingBottom: 10,
-    },
-
     listBoxes: {
         borderBottomWidth: 1,
         borderBottomColor: '#CFD8DC',
-        width: Dimensions.get('window').width - 100,
+        width: Dimensions.get('window').width - 90,
         justifyContent: 'center',
         alignItems: 'center',
     },
 
     list: {
-        fontSize: 20,
-        paddingTop: 8,
+        fontSize: 24,
+        paddingTop: 10,
         paddingBottom: 2,
     },
 
