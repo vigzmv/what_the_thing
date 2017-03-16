@@ -44,6 +44,7 @@ export default class what_the_thing extends Component {
         concepts: '',
         lnconcept: '',
         lang: 'hi',
+        langs: '',
         langsList: (<Text></Text>),
         isOpen: false,
         isDisabled: false,
@@ -56,7 +57,8 @@ export default class what_the_thing extends Component {
         this.emptyState = this.emptyState.bind(this);
         this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
-        this.langList = this.langList.bind(this);
+        this.getlangList = this.getlangList.bind(this);
+        this.setlanglist = this.setlanglist.bind(this);
         this.conceptCleanup = this.conceptCleanup.bind(this);
         this.loadOtherConcept = this.loadOtherConcept.bind(this);
         this.setLang = this.setLang.bind(this);
@@ -64,7 +66,7 @@ export default class what_the_thing extends Component {
 
 
     componentWillMount() {
-        this.langList();
+        this.getlangList();
         // StatusBarAndroid.hideStatusBar();
         StatusBarAndroid.setHexColor('#757575');
     }
@@ -74,7 +76,6 @@ export default class what_the_thing extends Component {
         this.setState({
             loadingVisible: !this.state.loadingVisible
         });
-        // StatusBarAndroid.hideStatusBar();
     }
 
 
@@ -82,44 +83,48 @@ export default class what_the_thing extends Component {
         this.setState({
             concepts: '',
             lnconcept: '',
-            lang: 'hi',
         });
     }
 
 
     setLang(key) {
         this.setState({lang:key});
-        this.refs.langs.close()
+        this.refs.langs.close();
     }
 
-    langList() {
+
+    setlanglist() {
+        const langsList = this.state.langs;
+        let list = [];
+        for (var key in langsList) {
+            if (langsList.hasOwnProperty(key)) {
+                list.push(<View style={styles.listBoxes} key={key}>
+                    <TouchableOpacity
+                        onPress={this.setLang.bind(this, key)}>
+                        <Text
+                            style={[styles.list, {color:this.state.lang == key?`#1b1b1b`:'#777777'}]}
+                            key={key}
+                            >
+                            {langsList[key]}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                );
+            }
+        }
+        // console.log(langsList);
+        this.setState({
+            langsList: list
+        });
+    }
+
+
+    getlangList() {
 
         fetch(yandexGetLang)
         .then(res => res.json())
         .then(data => {
-            const langsList = data.langs;
-            // console.log(langsList);
-            let list = [];
-            for (var key in langsList) {
-                if (langsList.hasOwnProperty(key)) {
-                    list.push(<View style={styles.listBoxes} key={key}>
-                        <TouchableOpacity
-                            onPress={this.setLang.bind(this, key)}>
-                            <Text
-                                style={[styles.list, {color:this.state.lang == key?`#1b1b1b`:'#777777'}]}
-                                key={key}
-                                >
-                                {langsList[key]}
-                            </Text>
-                        </TouchableOpacity>
-                    </View>
-                    );
-                }
-            }
-            // console.log(list);
-            this.setState({
-                langsList: list
-            });
+            this.setState({langs: data.langs });
         })
         .catch(err => console.log(err));
     }
@@ -152,6 +157,7 @@ export default class what_the_thing extends Component {
         else
             return ''
     }
+
 
     loadLnConcept() {
         return this.state.lnconcept;
@@ -195,10 +201,10 @@ export default class what_the_thing extends Component {
                     const concepts = (response.outputs[0].data.concepts.slice(0,10))
                     .map(concept => ({name:concept.name, val: concept.value}));
 
-                    console.table(concepts);
+                    // console.table(concepts);
                     //TODO: gota cleanup concepts first
                     const cleanConcept = self.conceptCleanup(concepts);
-                    console.table(cleanConcept);
+                    // console.table(cleanConcept);
                     conceptToTanslate = cleanConcept[0]['name'];
                     self.translateConcept(conceptToTanslate);
                     self.setTextContent(concepts);
@@ -234,7 +240,7 @@ export default class what_the_thing extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.lang]}>
-                            <TouchableOpacity onPress={() => {this.refs.langs.open(); this.langList();}}>
+                            <TouchableOpacity onPress={() => {this.refs.langs.open(); this.setlanglist();}}>
                                 <Icon name="gear" size={50}
                                 color={this.state.loadingVisible?transparent:whiteColor}
                             />
