@@ -6,8 +6,7 @@ import {
     Text,
     View,
     TouchableOpacity,
-    TouchableHighlight,
-    ScrollView,
+    ListView,
     ActivityIndicator,
 } from 'react-native';
 
@@ -39,16 +38,18 @@ export default class what_the_thing extends Component {
     constructor(props) {
     super();
 
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+
     this.state = {
         loadingVisible: false,
         concepts: '',
         lnconcept: '',
         lang: 'hi',
-        langs: '',
-        langsList: (<Text></Text>),
+        langs: [],
         isOpen: false,
-        isDisabled: false,
+        // isDisabled: false,
         swipeToClose: false,
+        dataSource: ds.cloneWithRows([]),
         };
 
         this.toggleLoader = this.toggleLoader.bind(this);
@@ -58,7 +59,6 @@ export default class what_the_thing extends Component {
         this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
         this.getlangList = this.getlangList.bind(this);
-        this.setlanglist = this.setlanglist.bind(this);
         this.conceptCleanup = this.conceptCleanup.bind(this);
         this.loadOtherConcept = this.loadOtherConcept.bind(this);
         this.setLang = this.setLang.bind(this);
@@ -93,38 +93,16 @@ export default class what_the_thing extends Component {
     }
 
 
-    setlanglist() {
-        const langsList = this.state.langs;
-        let list = [];
-        for (var key in langsList) {
-            if (langsList.hasOwnProperty(key)) {
-                list.push(<View style={styles.listBoxes} key={key}>
-                    <TouchableOpacity
-                        onPress={this.setLang.bind(this, key)}>
-                        <Text style={styles.list} key={key}>
-                            {langsList[key]}
-                        </Text>
-                    </TouchableOpacity>
-                </View>
-                );
-            }
-        }
-        // console.log(langsList);
-        this.setState({
-            langsList: list
-        });
-    }
-
-
     getlangList() {
 
         fetch(yandexGetLang)
         .then(res => res.json())
         .then(data => {
-            this.setState({langs: data.langs });
-            this.setlanglist();
+            this.setState({
+                dataSource: this.state.dataSource.cloneWithRows(data.langs)
+            })
         })
-        .catch(err => console.log(err));
+        .catch(err => alert(err));
     }
 
 
@@ -172,7 +150,7 @@ export default class what_the_thing extends Component {
             })
             this.toggleLoader();
         })
-        .catch(err => console.log(err));
+        .catch(err => alert(err));
     }
 
 
@@ -296,11 +274,19 @@ export default class what_the_thing extends Component {
                         // onOpened={this.onLangOpen}
                         onClosed={this.toggleLoader}
                         >
-                            <ScrollView style={styles.langList}>
-                                <View style={styles.langListView}>
-                                    {this.state.langsList}
+                        <ListView
+                            dataSource={this.state.dataSource}
+                            renderRow={(rowData, sectionID, rowID) =>
+                                <View style={styles.listBoxes}>
+                                    <TouchableOpacity
+                                        onPress={this.setLang.bind(this, rowID)}>
+                                        <Text style={styles.list}>
+                                                {rowData}
+                                        </Text>
+                                    </TouchableOpacity>
                                 </View>
-                            </ScrollView>
+                        }/>
+
                     </Modal>
 
                 </Camera>
