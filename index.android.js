@@ -44,7 +44,7 @@ export default class what_the_thing extends Component {
         concepts: '',
         lnconcept: '',
         lang: 'hi',
-        langsList: '',
+        langsList: (<Text></Text>),
         isOpen: false,
         isDisabled: false,
         swipeToClose: false,
@@ -59,13 +59,14 @@ export default class what_the_thing extends Component {
         this.langList = this.langList.bind(this);
         this.conceptCleanup = this.conceptCleanup.bind(this);
         this.loadOtherConcept = this.loadOtherConcept.bind(this);
+        this.setLang = this.setLang.bind(this);
     }
 
 
     componentWillMount() {
         this.langList();
         // StatusBarAndroid.hideStatusBar();
-        StatusBarAndroid.setHexColor('grey');
+        StatusBarAndroid.setHexColor('#757575');
     }
 
 
@@ -81,9 +82,15 @@ export default class what_the_thing extends Component {
         this.setState({
             concepts: '',
             lnconcept: '',
+            lang: 'hi',
         });
     }
 
+
+    setLang(key) {
+        this.setState({lang:key});
+        this.refs.langs.close()
+    }
 
     langList() {
 
@@ -95,8 +102,16 @@ export default class what_the_thing extends Component {
             let list = [];
             for (var key in langsList) {
                 if (langsList.hasOwnProperty(key)) {
-                    list.push(<View style={styles.listBoxes}  key={key}>
-                        <Text style={styles.list} key={key}>{langsList[key]} - {key}</Text>
+                    list.push(<View style={styles.listBoxes} key={key}>
+                        <TouchableOpacity
+                            onPress={this.setLang.bind(this, key)}>
+                            <Text
+                                style={[styles.list, {color:this.state.lang == key?`#1b1b1b`:'#777777'}]}
+                                key={key}
+                                >
+                                {langsList[key]}
+                            </Text>
+                        </TouchableOpacity>
                     </View>
                     );
                 }
@@ -131,9 +146,9 @@ export default class what_the_thing extends Component {
         const C = this.state.concepts;
 
         if(C!='')
-            return (
-                `${C[1]['name']}: ${C[1]['val']}, ${C[2]['name']}: ${C[2]['val']}, ${C[3]['name']}: ${C[3]['val']}`
-            );
+        return (
+            `${C[1]['name']}: ${C[1]['val']}, ${C[2]['name']}: ${C[2]['val']}, ${C[3]['name']}: ${C[3]['val']}`
+        );
         else
             return ''
     }
@@ -165,7 +180,6 @@ export default class what_the_thing extends Component {
             }
         )
     }
-
 
 
     takePicture() {
@@ -220,7 +234,7 @@ export default class what_the_thing extends Component {
                             </TouchableOpacity>
                         </View>
                         <View style={[styles.lang]}>
-                            <TouchableOpacity onPress={() => this.refs.langs.open()}>
+                            <TouchableOpacity onPress={() => {this.refs.langs.open(); this.langList();}}>
                                 <Icon name="gear" size={50}
                                 color={this.state.loadingVisible?transparent:whiteColor}
                             />
@@ -228,21 +242,6 @@ export default class what_the_thing extends Component {
                         </View>
                     </View>
 
-                    <Modal
-                        style={[styles.modal, styles.langs]}
-                        position={"center"}
-                        ref={"langs"}
-                        isDisabled={this.state.isDisabled}
-                        swipeToClose={this.state.swipeToClose}
-                        onClosed={this.onLangClose}
-                        onOpened={this.onLangOpen}
-                        >
-                            <ScrollView style={styles.langList}>
-                                <View style={styles.langListView}>
-                                    {this.state.langsList}
-                                </View>
-                            </ScrollView>
-                    </Modal>
 
                     <View style={styles.Concept}>
                         <Text style={styles.enConceptText}>
@@ -281,6 +280,22 @@ export default class what_the_thing extends Component {
                             </View>
                         </TouchableOpacity>
                     </View>
+
+                    <Modal
+                        style={[styles.modal, styles.langs]}
+                        position={"center"}
+                        ref={"langs"}
+                        isDisabled={this.state.isDisabled}
+                        swipeToClose={this.state.swipeToClose}
+                        onClosed={this.onLangClose}
+                        onOpened={this.onLangOpen}
+                        >
+                            <ScrollView style={styles.langList}>
+                                <View style={styles.langListView}>
+                                    {this.state.langsList}
+                                </View>
+                            </ScrollView>
+                    </Modal>
 
                 </Camera>
             </View>
@@ -338,7 +353,8 @@ const styles = StyleSheet.create({
     langs: {
         top: -20,
         height: Dimensions.get('window').height - 190,
-        width: Dimensions.get('window').width - 90,
+        width: Dimensions.get('window').width - 80,
+        paddingBottom: 10,
     },
 
     langListView: {
@@ -347,11 +363,10 @@ const styles = StyleSheet.create({
     },
 
     langList: {
-        width: Dimensions.get('window').width - 90,
+        width: Dimensions.get('window').width - 80,
         // paddingLeft: 50,
-        paddingTop: 20,
-        borderBottomWidth: 1,
-        borderBottomColor: 'grey',
+        paddingTop: 4,
+        paddingBottom: 10,
     },
 
     listBoxes: {
@@ -363,8 +378,9 @@ const styles = StyleSheet.create({
     },
 
     list: {
-        fontSize: 30,
-        paddingTop: 10,
+        fontSize: 20,
+        paddingTop: 8,
+        paddingBottom: 2,
     },
 
     Concept: {
