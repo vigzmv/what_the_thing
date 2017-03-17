@@ -13,7 +13,6 @@ import {
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modalbox';
-import Button from 'react-native-button';
 var StatusBarAndroid = require('react-native-android-statusbar');
 
 // Loading my api keys from external file ./apiKeys.json
@@ -39,13 +38,13 @@ export default class what_the_thing extends Component {
     super();
 
     const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    StatusBarAndroid.setHexColor('#757575');
 
     this.state = {
         loadingVisible: false,
         concepts: '',
-        lnconcept: '',
-        lang: 'hi',
-        langs: [],
+        translatedConcept: '',
+        tanslateLang: 'hi',
         isOpen: false,
         // isDisabled: false,
         swipeToClose: false,
@@ -53,22 +52,22 @@ export default class what_the_thing extends Component {
         };
 
         this.toggleLoader = this.toggleLoader.bind(this);
+        this.getlangList = this.getlangList.bind(this);
+        this.setLang = this.setLang.bind(this);
         this.setTextContent = this.setTextContent.bind(this);
         this.loadConcept = this.loadConcept.bind(this);
-        this.emptyState = this.emptyState.bind(this);
-        this.translateConcept = this.translateConcept.bind(this);
         this.loadLnConcept = this.loadLnConcept.bind(this);
-        this.getlangList = this.getlangList.bind(this);
-        this.conceptCleanup = this.conceptCleanup.bind(this);
         this.loadOtherConcept = this.loadOtherConcept.bind(this);
-        this.setLang = this.setLang.bind(this);
+        this.translateConcept = this.translateConcept.bind(this);
+        this.conceptCleanup = this.conceptCleanup.bind(this);
+        this.emptyState = this.emptyState.bind(this);
+
     }
 
 
     componentWillMount() {
         this.getlangList();
         // StatusBarAndroid.hideStatusBar();
-        StatusBarAndroid.setHexColor('#757575');
     }
 
 
@@ -82,13 +81,15 @@ export default class what_the_thing extends Component {
     emptyState() {
         this.setState({
             concepts: '',
-            lnconcept: '',
+            translatedConcept: '',
         });
     }
 
 
     setLang(key) {
-        this.setState({lang:key});
+        this.setState({
+            tanslateLang: key
+        });
         this.refs.langs.close();
     }
 
@@ -115,38 +116,29 @@ export default class what_the_thing extends Component {
 
     loadConcept() {
         const concept = this.state.concepts;
-
-        if(concept!='')
-            return (<Text> {concept[0]['name']}{'\n'}</Text>);
-        else
-            return ''
+        return concept ? (<Text> {concept[0]['name']}{'\n'}</Text>) : '';
     }
 
 
     loadOtherConcept() {
         const C = this.state.concepts;
-
-        if(C!='')
-        return (
-            `${C[1]['name']}: ${C[1]['val']}, ${C[2]['name']}: ${C[2]['val']}, ${C[3]['name']}: ${C[3]['val']}`
-        );
-        else
-            return ''
+        return C?
+            `${C[1]['name']}: ${C[1]['val']}, ${C[2]['name']}: ${C[2]['val']}, ${C[3]['name']}: ${C[3]['val']}` :  '';
     }
 
 
     loadLnConcept() {
-        return this.state.lnconcept;
+        return this.state.translatedConcept;
     }
 
 
     translateConcept(concept) {
 
-        fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.lang}`)
+        fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.tanslateLang}`)
         .then(res => res.json())
         .then(data => {
             this.setState({
-                lnconcept: data.text[0]
+                translatedConcept: data.text[0]
             })
             this.toggleLoader();
         })
@@ -158,7 +150,7 @@ export default class what_the_thing extends Component {
         return concepts.map((concept) => {
             concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
             if(!(concept.name.startsWith('no ')))
-                return ({name:concept.name, val: concept.val});
+                return ({name: concept.name, val: concept.val});
             }
         )
     }
@@ -167,13 +159,13 @@ export default class what_the_thing extends Component {
     takePicture() {
 
         const self = this;
-        self.emptyState();
         self.toggleLoader();
+        self.emptyState();
 
         this.camera.capture()
             .then((image64) => {
                 app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
-                .then(function(response) {
+                .then((response) => {
                     const concepts = (response.outputs[0].data.concepts.slice(0,10))
                     .map(concept => ({name:concept.name, val: concept.value}));
 
@@ -185,7 +177,7 @@ export default class what_the_thing extends Component {
                     self.translateConcept(conceptToTanslate);
                     self.setTextContent(concepts);
 
-                    }, function(err) {
+                }, (err) => {
                         alert(err);
                     });
             })
@@ -194,18 +186,19 @@ export default class what_the_thing extends Component {
 
 
     render() {
+
         return (
             <View style={styles.container}>
                 <Camera ref={(cam) => {
                     this.camera = cam;
                 }}
-                style={styles.preview}
-                aspect={Camera.constants.Aspect.fill}
-                type={Camera.constants.Type.back}
-                captureMode={Camera.constants.CaptureMode.still}
-                captureTarget={Camera.constants.CaptureTarget.memory}
-                captureQuality={Camera.constants.CaptureQuality.low}
-                playSoundOnCapture={true}
+                    style={styles.preview}
+                    aspect={Camera.constants.Aspect.fill}
+                    type={Camera.constants.Type.back}
+                    captureMode={Camera.constants.CaptureMode.still}
+                    captureTarget={Camera.constants.CaptureTarget.memory}
+                    captureQuality={Camera.constants.CaptureQuality.low}
+                    playSoundOnCapture={true}
                 >
                     <View style={[styles.topIcons,]}>
                         <View style={[styles.info]}>
@@ -215,6 +208,7 @@ export default class what_the_thing extends Component {
                             />
                             </TouchableOpacity>
                         </View>
+
                         <View style={[styles.gear]}>
                             <TouchableOpacity onPress={() => {this.toggleLoader(); this.refs.langs.open();}}>
                                 <Icon name="gear" size={50}
@@ -224,9 +218,8 @@ export default class what_the_thing extends Component {
                         </View>
                     </View>
 
-
                     <View style={styles.Concept}>
-                        <Text style={styles.enConceptText}>
+                        <Text style={styles.lnConceptText}>
                             {this.loadLnConcept()}
                         </Text>
                     </View>
@@ -241,13 +234,13 @@ export default class what_the_thing extends Component {
                     </View>
 
                     <View style={styles.Concept}>
-                        <Text style={styles.lnConceptText}>
+                        <Text style={styles.enConceptText}>
                             {this.loadConcept()}
                         </Text>
                     </View>
-                    <View style={{top: 18}}>
-                        <Text style={[styles.lnConceptText,]}>
-                            <Text style={{fontSize:14}}> {this.loadOtherConcept()}</Text>
+                    <View style={{top: 10}}>
+                        <Text style={[styles.enConceptText,]}>
+                            <Text style={{fontSize:14}}> {this.loadOtherConcept()} </Text>
                         </Text>
                     </View>
 
@@ -344,7 +337,7 @@ const styles = StyleSheet.create({
     },
 
     langs: {
-        height: Dimensions.get('window').height - 120,
+        height: Dimensions.get('window').height - 100,
         width: Dimensions.get('window').width - 80,
         paddingBottom: 10,
     },
@@ -365,19 +358,18 @@ const styles = StyleSheet.create({
 
     Concept: {
         flex: 1,
-        top: Dimensions.get('window').height/5.5,
+        top: Dimensions.get('window').height/6,
         alignItems: 'center',
     },
 
-    enConceptText: {
-        fontSize: 40,
+    lnConceptText: {
+        fontSize: 42,
         color: 'white',
-        top: 0,
     },
 
-    lnConceptText: {
+    enConceptText: {
         bottom: Dimensions.get('window').height/8,
-        fontSize: 35,
+        fontSize: 38,
         color: 'white',
     }
 });
