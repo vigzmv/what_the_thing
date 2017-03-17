@@ -54,7 +54,7 @@ export default class what_the_thing extends Component {
       loadingVisible: false,
       concepts: '',
       translatedConcept: '',
-      tanslateLang: 'hi',
+      translateLang: 'hi',
       isOpen: false,
       // isDisabled: false,
       swipeToClose: false,
@@ -94,7 +94,7 @@ export default class what_the_thing extends Component {
 
   setLang(langCode, langName) {
     this.setState({
-      tanslateLang: langCode
+      translateLang: langCode
     });
     this.refs.langs.close();
 
@@ -161,8 +161,7 @@ export default class what_the_thing extends Component {
   }
 
   translateConcept(concept) {
-
-    fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.tanslateLang}`)
+    fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.translateLang}`)
     .then(res => res.json())
     .then(data => {
       this.setState({
@@ -190,21 +189,20 @@ export default class what_the_thing extends Component {
     this.camera.capture()
     .then((image64) => {
       app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
-      .then((response) => {
+      .then(function(response) {
         const concepts = (response.outputs[0].data.concepts.slice(0, 10))
         .map(concept => ({
           name: concept.name,
-          val: concept.value,})
-        );
+          val: concept.value,
+        }));
 
         // console.table(concepts);
         const cleanConcept = self.conceptCleanup(concepts);
-        // console.table(cleanConcept);
-        conceptToTanslate = cleanConcept[0]['name'];
+        const conceptToTanslate = cleanConcept[0]['name'];
         self.translateConcept(conceptToTanslate);
         self.setTextContent(concepts);
 
-      }, (err) => {
+      }, function(err) {
         alert(err);
       });
     }).catch(err => alert(err));

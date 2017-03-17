@@ -12,7 +12,7 @@ module.exports = StyleSheet.create({
   activityIcon: {
     alignItems: 'center',
     justifyContent: 'center',
-    top: Dimensions.get('window').height / 7,
+    top: Dimensions.get('window').height / 8,
   },
 
   preview: {
