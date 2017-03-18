@@ -48,13 +48,11 @@ export default class what_the_thing extends Component {
       rowHasChanged: (r1, r2) => r1 !== r2
     });
 
-    StatusBarAndroid.setHexColor('#757575');
-
     this.state = {
       loadingVisible: false,
       concepts: '',
       translatedConcept: '',
-      translateLang: 'hi',
+      translateLang: '',
       isOpen: false,
       // isDisabled: false,
       swipeToClose: false,
@@ -72,11 +70,47 @@ export default class what_the_thing extends Component {
     this.conceptCleanup = this.conceptCleanup.bind(this);
     this.emptyState = this.emptyState.bind(this);
 
+    StatusBarAndroid.setHexColor('#757575');
   }
 
   componentWillMount() {
     this.getlangList();
     // StatusBarAndroid.hideStatusBar();
+  }
+
+  componentDidMount() {
+    try {
+      AsyncStorage.getItem('langCode')
+      .then((value) => {
+        if (value !== null) {
+          this.setState({
+            translateLang: value
+          });
+        } else {
+          this.setState({
+            translateLang: 'hi'
+          });
+        }
+      });
+    } catch (error) {
+      alert(error);
+    }
+
+    try {
+      AsyncStorage.getItem('langName')
+      .then((value) => {
+        if (value !== null) {
+          ToastAndroid.showWithGravity(
+            `Language set: ${value}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.CENTER);
+        } else {
+          this.setLang('hi', 'Hindi');
+        }
+      });
+    } catch (error) {
+      alert(error);
+    }
   }
 
   toggleLoader() {
@@ -93,6 +127,18 @@ export default class what_the_thing extends Component {
   }
 
   setLang(langCode, langName) {
+    try {
+      AsyncStorage.setItem('langCode', langCode);
+    } catch (error) {
+      alert(error);
+    }
+
+    try {
+      AsyncStorage.setItem('langName', langName);
+    } catch (error) {
+      alert(error);
+    }
+
     this.setState({
       translateLang: langCode
     });
@@ -172,12 +218,10 @@ export default class what_the_thing extends Component {
   }
 
   conceptCleanup(concepts) {
-    return concepts.map((concept) => {
-      concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]
-      if (!(concept.name.startsWith('no ')))
-        return ({name: concept.name, val: concept.val,});
-      }
-    )
+    return concepts.filter((concept) => {
+      concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+      return (!(concept.name.startsWith('no ')))
+    })
   }
 
   takePicture() {
@@ -196,11 +240,11 @@ export default class what_the_thing extends Component {
           val: concept.value,
         }));
 
-        // console.table(concepts);
         const cleanConcept = self.conceptCleanup(concepts);
         const conceptToTanslate = cleanConcept[0]['name'];
+
         self.translateConcept(conceptToTanslate);
-        self.setTextContent(concepts);
+        self.setTextContent(cleanConcept);
 
       }, function(err) {
         alert(err);
@@ -209,7 +253,7 @@ export default class what_the_thing extends Component {
   }
 
   render() {
-
+    
     return (
       <View style={styles.container}>
         <Camera
