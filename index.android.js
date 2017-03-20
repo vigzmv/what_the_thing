@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 import React, {Component} from 'react';
 import {
@@ -253,7 +253,7 @@ export default class what_the_thing extends Component {
   }
 
   render() {
-    
+
     return (
       <View style={styles.container}>
         <Camera
