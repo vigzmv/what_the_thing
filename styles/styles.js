@@ -1,12 +1,9 @@
-'use strict'
-
-import React, {Component} from 'react';
-import {StyleSheet, Dimensions,} from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
 
 module.exports = StyleSheet.create({
 
   container: {
-    flex: 1
+    flex: 1,
   },
 
   activityIcon: {
@@ -24,12 +21,11 @@ module.exports = StyleSheet.create({
   },
 
   cameraIco: {
-    bottom: 20
+    bottom: 20,
   },
 
   topIcons: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     top: 10,
   },
 
@@ -65,7 +61,7 @@ module.exports = StyleSheet.create({
   },
 
   infoText: {
-    fontSize: 25
+    fontSize: 25,
   },
 
   listBoxes: {

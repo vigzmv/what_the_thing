@@ -1,10 +1,6 @@
-'use strict';
-
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   AppRegistry,
-  StyleSheet,
-  Dimensions,
   Text,
   View,
   TouchableOpacity,
@@ -15,25 +11,27 @@ import {
   Linking,
 } from 'react-native';
 
-import styles from './styles/styles';
-
 import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modalbox';
-var StatusBarAndroid = require('react-native-android-statusbar');
+
+const StatusBarAndroid = require('react-native-android-statusbar');
 
 // Loading my api keys from external file ./apiKeys.json
 const apiKeys = require('./apiKeys.json');
+
+import styles from './styles/styles';
+
 const yandexKey = apiKeys.yandexTranslateKey;
 
 // Yandex, for translating concepts
-const yandexGetLang = `https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=${yandexKey}&ui=en`
-const yandexGetTranslate = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${yandexKey}`
+const yandexGetLang = `https://translate.yandex.net/api/v1.5/tr.json/getLangs?key=${yandexKey}&ui=en`;
+const yandexGetTranslate = `https://translate.yandex.net/api/v1.5/tr.json/translate?key=${yandexKey}`;
 
 // Clarifai, for image recognition
 const Clarifai = require('clarifai');
 
-var app = new Clarifai.App(apiKeys.clarifaiID, apiKeys.clarifaiSecret,);
+const app = new Clarifai.App(apiKeys.clarifaiID, apiKeys.clarifaiSecret);
 
 const whiteColor = '#E8EAF6CC';
 const transparent = '#00000000';
@@ -41,11 +39,11 @@ const transparent = '#00000000';
 
 export default class what_the_thing extends Component {
 
-  constructor(props) {
+  constructor() {
     super();
 
     const ds = new ListView.DataSource({
-      rowHasChanged: (r1, r2) => r1 !== r2
+      rowHasChanged: (r1, r2) => r1 !== r2,
     });
 
     this.state = {
@@ -56,7 +54,7 @@ export default class what_the_thing extends Component {
       isOpen: false,
       // isDisabled: false,
       swipeToClose: false,
-      dataSource: ds.cloneWithRows([])
+      dataSource: ds.cloneWithRows([]),
     };
 
     this.toggleLoader = this.toggleLoader.bind(this);
@@ -84,11 +82,11 @@ export default class what_the_thing extends Component {
       .then((value) => {
         if (value !== null) {
           this.setState({
-            translateLang: value
+            translateLang: value,
           });
         } else {
           this.setState({
-            translateLang: 'hi'
+            translateLang: 'hi',
           });
         }
       });
@@ -115,14 +113,14 @@ export default class what_the_thing extends Component {
 
   toggleLoader() {
     this.setState({
-      loadingVisible: !this.state.loadingVisible
+      loadingVisible: !this.state.loadingVisible,
     });
   }
 
   emptyState() {
     this.setState({
       concepts: '',
-      translatedConcept: ''
+      translatedConcept: '',
     });
   }
 
@@ -140,7 +138,7 @@ export default class what_the_thing extends Component {
     }
 
     this.setState({
-      translateLang: langCode
+      translateLang: langCode,
     });
     this.refs.langs.close();
 
@@ -152,21 +150,20 @@ export default class what_the_thing extends Component {
 
   // get supported langsList from localstorage || yandex api
   getlangList() {
-
     try {
       AsyncStorage.getItem('langsList')
       .then((value) => {
         if (value !== null) {
           this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(JSON.parse(value))
+            dataSource: this.state.dataSource.cloneWithRows(JSON.parse(value)),
           });
         } else {
           fetch(yandexGetLang)
           .then(res => res.json())
-          .then(data => {
+          .then((data) => {
             this.setState({
-              dataSource: this.state.dataSource.cloneWithRows(data.langs)
-            })
+              dataSource: this.state.dataSource.cloneWithRows(data.langs),
+            });
             try {
               AsyncStorage.setItem('langsList', JSON.stringify(data.langs));
             } catch (error) {
@@ -175,12 +172,14 @@ export default class what_the_thing extends Component {
           }).catch(err => alert(err));
         }
       }).done();
-    } catch (error) {}
+    } catch (error) {
+      // alert(error)
+    }
   }
 
   setTextContent(concepts) {
     this.setState({
-      concepts: concepts
+      concepts,
     });
   }
 
@@ -189,7 +188,7 @@ export default class what_the_thing extends Component {
     return concept
       ? (
         <Text>
-          {concept[0]['name']}{'\n'}
+          {concept[0].name}{'\n'}
         </Text>
       )
       : '';
@@ -198,7 +197,7 @@ export default class what_the_thing extends Component {
   loadOtherConcept() {
     const C = this.state.concepts;
     return C
-      ? `${C[1]['name']}: ${C[1]['val']}, ${C[2]['name']}: ${C[2]['val']}, ${C[3]['name']}: ${C[3]['val']}`
+      ? `${C[1].name}: ${C[1].val}, ${C[2].name}: ${C[2].val}, ${C[3].name}: ${C[3].val}`
       : '';
   }
 
@@ -209,10 +208,10 @@ export default class what_the_thing extends Component {
   translateConcept(concept) {
     fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.translateLang}`)
     .then(res => res.json())
-    .then(data => {
+    .then((data) => {
       this.setState({
-        translatedConcept: data.text[0]
-      })
+        translatedConcept: data.text[0],
+      });
       this.toggleLoader();
     }).catch(err => alert(err));
   }
@@ -220,20 +219,19 @@ export default class what_the_thing extends Component {
   conceptCleanup(concepts) {
     return concepts.filter((concept) => {
       concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
-      return (!(concept.name.startsWith('no ')))
-    })
+      return (!(concept.name.startsWith('no ')));
+    });
   }
 
   takePicture() {
-
     const self = this;
     self.toggleLoader();
     self.emptyState();
 
     this.camera.capture()
     .then((image64) => {
-      app.models.predict(Clarifai.GENERAL_MODEL, {base64: image64.data})
-      .then(function(response) {
+      app.models.predict(Clarifai.GENERAL_MODEL, { base64: image64.data })
+      .then(function (response) {
         const concepts = (response.outputs[0].data.concepts.slice(0, 10))
         .map(concept => ({
           name: concept.name,
@@ -241,25 +239,24 @@ export default class what_the_thing extends Component {
         }));
 
         const cleanConcept = self.conceptCleanup(concepts);
-        const conceptToTanslate = cleanConcept[0]['name'];
+        const conceptToTanslate = cleanConcept[0].name;
 
         self.translateConcept(conceptToTanslate);
         self.setTextContent(cleanConcept);
-
-      }, function(err) {
+      },
+      function (err) {
         alert(err);
       });
     }).catch(err => alert(err));
   }
 
   render() {
-
     return (
       <View style={styles.container}>
         <Camera
           ref={(cam) => {
           this.camera = cam;
-        }}
+          }}
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill}
           type={Camera.constants.Type.back}
@@ -268,17 +265,18 @@ export default class what_the_thing extends Component {
           captureQuality={Camera.constants.CaptureQuality.low}
           playSoundOnCapture={true}>
 
-          <View style={[styles.topIcons,]}>
+          <View style={[styles.topIcons]}>
             <View style={[styles.info]}>
               <TouchableOpacity
                 onPress={() => {
                 this.toggleLoader();
                 this.refs.info.open();
-              }}>
+                }}
+              >
                 <Icon
                   name="question-circle-o"
                   size={50}
-                  color={this.state.loadingVisible? transparent: whiteColor}
+                  color={this.state.loadingVisible ? transparent : whiteColor}
                 />
               </TouchableOpacity>
             </View>
@@ -288,11 +286,12 @@ export default class what_the_thing extends Component {
                 onPress={() => {
                 this.toggleLoader();
                 this.refs.langs.open();
-              }}>
+                }}
+              >
                 <Icon
                   name="gear"
                   size={50}
-                  color={this.state.loadingVisible? transparent: whiteColor}
+                  color={this.state.loadingVisible ? transparent : whiteColor}
                 />
               </TouchableOpacity>
             </View>
@@ -304,10 +303,10 @@ export default class what_the_thing extends Component {
             </Text>
           </View>
 
-          <View style={[{ flex: 1 },]}>
+          <View style={[{ flex: 1 }]}>
             <ActivityIndicator
               animating={this.state.loadingVisible}
-              style={[styles.activityIcon,]}
+              style={[styles.activityIcon]}
               size="large"
               // color="white"
             />
@@ -318,70 +317,77 @@ export default class what_the_thing extends Component {
               {this.loadConcept()}
             </Text>
           </View>
-          <View style={{top: 10}}>
-            <Text style={[styles.enConceptText,]}>
-              <Text style={{fontSize: 14}}>
+          <View style={{ top: 10 }}>
+            <Text style={[styles.enConceptText]}>
+              <Text style={{ fontSize: 14 }}>
                 {this.loadOtherConcept()}
               </Text>
             </Text>
           </View>
 
-          <View style={[{height: 70}]}>
+          <View style={[{ height: 70 }]}>
             <TouchableOpacity
-              style={[styles.cameraIco, { height: this.state.loadingVisible ? 0 : 72},]}
-              onPress={this.takePicture.bind(this)}>
+              style={[styles.cameraIco, { height: this.state.loadingVisible ? 0 : 72}]}
+              onPress={this.takePicture.bind(this)}
+            >
               <View>
                 <Icon
                   name="eercast"
                   size={70}
-                  color={this.state.loadingVisible ? transparent : whiteColor}/>
+                  color={this.state.loadingVisible ? transparent : whiteColor}
+                />
               </View>
             </TouchableOpacity>
           </View>
 
           <Modal
-            style={[styles.modal, styles.langs,]}
-            position={"center"}
-            ref={"langs"}
+            style={[styles.modal, styles.langs]}
+            position={'center'}
+            ref={'langs'}
             swipeToClose={this.state.swipeToClose}
-            onClosed={this.toggleLoader}>
+            onClosed={this.toggleLoader}
+          >
 
             <ListView
               dataSource={this.state.dataSource}
               renderRow={(rowData, sectionID, rowID) => <View style={styles.listBoxes}>
-              <TouchableOpacity
-                onPress={this.setLang.bind(this, rowID, rowData)}>
-                <Text style={styles.list}>
-                  {rowData}
-                </Text>
-              </TouchableOpacity>
-            </View>}/>
+                <TouchableOpacity
+                  onPress={this.setLang.bind(this, rowID, rowData)}
+                >
+                  <Text style={styles.list}>
+                    {rowData}
+                  </Text>
+                </TouchableOpacity>
+              </View>}
+            />
 
           </Modal>
 
           <Modal
-            style={[styles.modal, styles.infoBox,]}
-            position={"center"}
-            ref={"info"}
+            style={[styles.modal, styles.infoBox]}
+            position={'center'}
+            ref={'info'}
             swipeToClose={true}
-            onClosed={this.toggleLoader}>
-              <View>
-                <Text style={styles.infoText}>
-                  What The Thing?{'\n\n'}
-                </Text>
-              </View>
-              <View>
-                <Text style={[styles.infoText,{fontSize:15}]}>
-                  Point camera at things to learn how to say them in a different language{'\n\n'}
-                </Text>
-              </View>
-              <View>
-                <Text
-                  style={[styles.infoText,{fontSize:15, color: 'blue'}]}
-                  onPress={() => Linking.openURL('https://github.com/vigzmv/what_the_thing')}>
-                  Github:/vigzmv/what_the_thing
-                </Text>
-              </View>
+            onClosed={this.toggleLoader}
+          >
+            <View>
+              <Text style={styles.infoText}>
+                What The Thing?{'\n\n'}
+              </Text>
+            </View>
+            <View>
+              <Text style={[styles.infoText, { fontSize:15 }]}>
+                Point camera at things to learn how to say them in a different language{'\n\n'}
+              </Text>
+            </View>
+            <View>
+              <Text
+                style={[styles.infoText, { fontSize: 15, color: 'blue' }]}
+                onPress={() => Linking.openURL('https://github.com/vigzmv/what_the_thing')}
+              >
+                Github:/vigzmv/what_the_thing
+              </Text>
+            </View>
           </Modal>
 
         </Camera>
