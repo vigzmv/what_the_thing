@@ -15,12 +15,12 @@ import Camera from 'react-native-camera';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Modal from 'react-native-modalbox';
 
+import styles from './styles/styles';
+
 const StatusBarAndroid = require('react-native-android-statusbar');
 
 // Loading my api keys from external file ./apiKeys.json
 const apiKeys = require('./apiKeys.json');
-
-import styles from './styles/styles';
 
 const yandexKey = apiKeys.yandexTranslateKey;
 
@@ -111,19 +111,6 @@ export default class what_the_thing extends Component {
     }
   }
 
-  toggleLoader() {
-    this.setState({
-      loadingVisible: !this.state.loadingVisible,
-    });
-  }
-
-  emptyState() {
-    this.setState({
-      concepts: '',
-      translatedConcept: '',
-    });
-  }
-
   setLang(langCode, langName) {
     try {
       AsyncStorage.setItem('langCode', langCode);
@@ -180,6 +167,19 @@ export default class what_the_thing extends Component {
   setTextContent(concepts) {
     this.setState({
       concepts,
+    });
+  }
+
+  emptyState() {
+    this.setState({
+      concepts: '',
+      translatedConcept: '',
+    });
+  }
+
+  toggleLoader() {
+    this.setState({
+      loadingVisible: !this.state.loadingVisible,
     });
   }
 
