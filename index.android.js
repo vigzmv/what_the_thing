@@ -86,7 +86,7 @@ export default class what_the_thing extends Component {
           });
         } else {
           this.setState({
-            translateLang: 'hi',
+            translateLang: 'hi', // default lang set to hindi
           });
         }
       });
@@ -103,7 +103,7 @@ export default class what_the_thing extends Component {
             ToastAndroid.SHORT,
             ToastAndroid.CENTER);
         } else {
-          this.setLang('hi', 'Hindi');
+          this.setLang('hi', 'Hindi'); // default set to Hindi
         }
       });
     } catch (error) {
@@ -111,6 +111,8 @@ export default class what_the_thing extends Component {
     }
   }
 
+  // Set the language for translation
+  // Get language code form localstorage || default
   setLang(langCode, langName) {
     try {
       AsyncStorage.setItem('langCode', langCode);
@@ -177,6 +179,7 @@ export default class what_the_thing extends Component {
     });
   }
 
+  // ActivityIndicator toggler
   toggleLoader() {
     this.setState({
       loadingVisible: !this.state.loadingVisible,
@@ -205,6 +208,7 @@ export default class what_the_thing extends Component {
     return this.state.translatedConcept;
   }
 
+  // Tranlate text by using Yandex
   translateConcept(concept) {
     fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.translateLang}`)
     .then(res => res.json())
@@ -216,13 +220,15 @@ export default class what_the_thing extends Component {
     }).catch(err => alert(err));
   }
 
+  // To remove 'no *****' results from output
   conceptCleanup(concepts) {
     return concepts.filter((concept) => {
-      concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0];
+      concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]; // keeping only 2 digits after decimal
       return (!(concept.name.startsWith('no ')));
     });
   }
 
+  // Action on caputuring image
   takePicture() {
     const self = this;
     self.toggleLoader();
@@ -250,9 +256,12 @@ export default class what_the_thing extends Component {
     }).catch(err => alert(err));
   }
 
+
   render() {
     return (
       <View style={styles.container}>
+
+        {/* Fullscreen Camera View */}
         <Camera
           ref={(cam) => {
           this.camera = cam;
@@ -265,6 +274,7 @@ export default class what_the_thing extends Component {
           captureQuality={Camera.constants.CaptureQuality.low}
           playSoundOnCapture={true}>
 
+          {/* Top Icons */}
           <View style={[styles.topIcons]}>
             <View style={[styles.info]}>
               <TouchableOpacity
@@ -312,6 +322,7 @@ export default class what_the_thing extends Component {
             />
           </View>
 
+          {/* English concepts */}
           <View style={styles.Concept}>
             <Text style={styles.enConceptText}>
               {this.loadConcept()}
@@ -325,6 +336,7 @@ export default class what_the_thing extends Component {
             </Text>
           </View>
 
+          {/* Camera Shoot icon */}
           <View style={[{ height: 70 }]}>
             <TouchableOpacity
               style={[styles.cameraIco, { height: this.state.loadingVisible ? 0 : 72}]}
@@ -340,6 +352,7 @@ export default class what_the_thing extends Component {
             </TouchableOpacity>
           </View>
 
+          {/* Language List modal */}
           <Modal
             style={[styles.modal, styles.langs]}
             position={'center'}
@@ -363,6 +376,7 @@ export default class what_the_thing extends Component {
 
           </Modal>
 
+          {/* Info Modal */}
           <Modal
             style={[styles.modal, styles.infoBox]}
             position={'center'}

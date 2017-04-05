@@ -6,7 +6,8 @@ Made it as a part of my learning process of [React](https://github.com/facebook/
 
 Inspired by [Thing Translator](https://github.com/dmotz/thing-translator) by [dmotz](https://github.com/dmotz).
 
-![58e4ef54dc57a683107473](https://cloud.githubusercontent.com/assets/14950089/24707370/ec75d8d2-1a30-11e7-84ff-5040949f6645.gif)
+![ezgif-2-c2d47b51b0](https://cloud.githubusercontent.com/assets/14950089/24720723/b2305c4e-1a5b-11e7-8717-672866128ef0.gif)
+&nbsp;&nbsp;&nbsp;&nbsp;
 ![58e4ef22e1d7d646107794](https://cloud.githubusercontent.com/assets/14950089/24707372/ec7b4538-1a30-11e7-944d-98addd4ff146.gif)  
 
 ## How it works ?
