@@ -36,9 +36,7 @@ const app = new Clarifai.App(apiKeys.clarifaiID, apiKeys.clarifaiSecret);
 const whiteColor = '#E8EAF6CC';
 const transparent = '#00000000';
 
-
 export default class what_the_thing extends Component {
-
   constructor() {
     super();
 
@@ -78,8 +76,7 @@ export default class what_the_thing extends Component {
 
   componentDidMount() {
     try {
-      AsyncStorage.getItem('langCode')
-      .then((value) => {
+      AsyncStorage.getItem('langCode').then((value) => {
         if (value !== null) {
           this.setState({
             translateLang: value,
@@ -95,13 +92,13 @@ export default class what_the_thing extends Component {
     }
 
     try {
-      AsyncStorage.getItem('langName')
-      .then((value) => {
+      AsyncStorage.getItem('langName').then((value) => {
         if (value !== null) {
           ToastAndroid.showWithGravity(
             `Language set: ${value}`,
             ToastAndroid.SHORT,
-            ToastAndroid.CENTER);
+            ToastAndroid.CENTER,
+          );
         } else {
           this.setLang('hi', 'Hindi'); // default set to Hindi
         }
@@ -134,35 +131,40 @@ export default class what_the_thing extends Component {
     ToastAndroid.showWithGravity(
       `Language set: ${langName}`,
       ToastAndroid.SHORT,
-      ToastAndroid.CENTER);
+      ToastAndroid.CENTER,
+    );
   }
 
   // get supported langsList from localstorage || yandex api
   getlangList() {
     try {
       AsyncStorage.getItem('langsList')
-      .then((value) => {
-        if (value !== null) {
-          this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(JSON.parse(value)),
-          });
-        } else {
-          fetch(yandexGetLang)
-          .then(res => res.json())
-          .then((data) => {
+        .then((value) => {
+          if (value !== null) {
             this.setState({
-              dataSource: this.state.dataSource.cloneWithRows(data.langs),
+              dataSource: this.state.dataSource.cloneWithRows(
+                JSON.parse(value),
+              ),
             });
-            try {
-              AsyncStorage.setItem('langsList', JSON.stringify(data.langs));
-            } catch (error) {
-              alert(error)
-            }
-          }).catch(err => alert(err));
-        }
-      }).done();
+          } else {
+            fetch(yandexGetLang)
+              .then(res => res.json())
+              .then((data) => {
+                this.setState({
+                  dataSource: this.state.dataSource.cloneWithRows(data.langs),
+                });
+                try {
+                  AsyncStorage.setItem('langsList', JSON.stringify(data.langs));
+                } catch (error) {
+                  alert(error);
+                }
+              })
+              .catch(err => alert(err));
+          }
+        })
+        .done();
     } catch (error) {
-      // alert(error)
+      // alert(error);
     }
   }
 
@@ -189,11 +191,9 @@ export default class what_the_thing extends Component {
   loadConcept() {
     const concept = this.state.concepts;
     return concept
-      ? (
-        <Text>
-          {concept[0].name}{'\n'}
-        </Text>
-      )
+      ? <Text>
+        {concept[0].name}{'\n'}
+      </Text>
       : '';
   }
 
@@ -210,21 +210,24 @@ export default class what_the_thing extends Component {
 
   // Tranlate text by using Yandex
   translateConcept(concept) {
-    fetch(`${yandexGetTranslate}&text=${concept}&lang=${this.state.translateLang}`)
-    .then(res => res.json())
-    .then((data) => {
-      this.setState({
-        translatedConcept: data.text[0],
-      });
-      this.toggleLoader();
-    }).catch(err => alert(err));
+    fetch(
+      `${yandexGetTranslate}&text=${concept}&lang=${this.state.translateLang}`,
+    )
+      .then(res => res.json())
+      .then((data) => {
+        this.setState({
+          translatedConcept: data.text[0],
+        });
+        this.toggleLoader();
+      })
+      .catch(err => alert(err));
   }
 
   // To remove 'no *****' results from output
   conceptCleanup(concepts) {
     return concepts.filter((concept) => {
       concept.val = concept.val.toString().match(/^-?\d+(?:\.\d{0,2})?/)[0]; // keeping only 2 digits after decimal
-      return (!(concept.name.startsWith('no ')));
+      return !concept.name.startsWith('no ');
     });
   }
 
@@ -234,28 +237,33 @@ export default class what_the_thing extends Component {
     self.toggleLoader();
     self.emptyState();
 
-    this.camera.capture()
-    .then((image64) => {
-      app.models.predict(Clarifai.GENERAL_MODEL, { base64: image64.data })
-      .then(function (response) {
-        const concepts = (response.outputs[0].data.concepts.slice(0, 10))
-        .map(concept => ({
-          name: concept.name,
-          val: concept.value,
-        }));
+    this.camera
+      .capture()
+      .then((image64) => {
+        app.models
+          .predict(Clarifai.GENERAL_MODEL, { base64: image64.data })
+          .then(
+            (response) => {
+              const concepts = response.outputs[0].data.concepts
+                .slice(0, 10)
+                .map(concept => ({
+                  name: concept.name,
+                  val: concept.value,
+                }));
 
-        const cleanConcept = self.conceptCleanup(concepts);
-        const conceptToTanslate = cleanConcept[0].name;
+              const cleanConcept = self.conceptCleanup(concepts);
+              const conceptToTanslate = cleanConcept[0].name;
 
-        self.translateConcept(conceptToTanslate);
-        self.setTextContent(cleanConcept);
-      },
-      function (err) {
-        alert(err);
-      });
-    }).catch(err => alert(err));
+              self.translateConcept(conceptToTanslate);
+              self.setTextContent(cleanConcept);
+            },
+            (err) => {
+              alert(err);
+            },
+          );
+      })
+      .catch(err => alert(err));
   }
-
 
   render() {
     return (
@@ -264,7 +272,7 @@ export default class what_the_thing extends Component {
         {/* Fullscreen Camera View */}
         <Camera
           ref={(cam) => {
-          this.camera = cam;
+            this.camera = cam;
           }}
           style={styles.preview}
           aspect={Camera.constants.Aspect.fill}
@@ -272,15 +280,16 @@ export default class what_the_thing extends Component {
           captureMode={Camera.constants.CaptureMode.still}
           captureTarget={Camera.constants.CaptureTarget.memory}
           captureQuality={Camera.constants.CaptureQuality.low}
-          playSoundOnCapture={true}>
+          playSoundOnCapture
+        >
 
           {/* Top Icons */}
           <View style={[styles.topIcons]}>
             <View style={[styles.info]}>
               <TouchableOpacity
                 onPress={() => {
-                this.toggleLoader();
-                this.refs.info.open();
+                  this.toggleLoader();
+                  this.refs.info.open();
                 }}
               >
                 <Icon
@@ -294,8 +303,8 @@ export default class what_the_thing extends Component {
             <View style={[styles.gear]}>
               <TouchableOpacity
                 onPress={() => {
-                this.toggleLoader();
-                this.refs.langs.open();
+                  this.toggleLoader();
+                  this.refs.langs.open();
                 }}
               >
                 <Icon
@@ -339,7 +348,10 @@ export default class what_the_thing extends Component {
           {/* Camera Shoot icon */}
           <View style={[{ height: 70 }]}>
             <TouchableOpacity
-              style={[styles.cameraIco, { height: this.state.loadingVisible ? 0 : 72}]}
+              style={[
+                styles.cameraIco,
+                { height: this.state.loadingVisible ? 0 : 72 },
+              ]}
               onPress={this.takePicture.bind(this)}
             >
               <View>
@@ -363,15 +375,17 @@ export default class what_the_thing extends Component {
 
             <ListView
               dataSource={this.state.dataSource}
-              renderRow={(rowData, sectionID, rowID) => <View style={styles.listBoxes}>
-                <TouchableOpacity
-                  onPress={this.setLang.bind(this, rowID, rowData)}
-                >
-                  <Text style={styles.list}>
-                    {rowData}
-                  </Text>
-                </TouchableOpacity>
-              </View>}
+              renderRow={(rowData, sectionID, rowID) => (
+                <View style={styles.listBoxes}>
+                  <TouchableOpacity
+                    onPress={this.setLang.bind(this, rowID, rowData)}
+                  >
+                    <Text style={styles.list}>
+                      {rowData}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             />
 
           </Modal>
@@ -381,7 +395,7 @@ export default class what_the_thing extends Component {
             style={[styles.modal, styles.infoBox]}
             position={'center'}
             ref={'info'}
-            swipeToClose={true}
+            swipeToClose
             onClosed={this.toggleLoader}
           >
             <View>
@@ -390,14 +404,16 @@ export default class what_the_thing extends Component {
               </Text>
             </View>
             <View>
-              <Text style={[styles.infoText, { fontSize:15 }]}>
-                Point camera at things to learn how to say them in a different language{'\n\n'}
+              <Text style={[styles.infoText, { fontSize: 15 }]}>
+                Point camera at things to learn how to say them in a different language
+                {'\n\n'}
               </Text>
             </View>
             <View>
               <Text
                 style={[styles.infoText, { fontSize: 15, color: 'blue' }]}
-                onPress={() => Linking.openURL('https://github.com/vigzmv/what_the_thing')}
+                onPress={() =>
+                  Linking.openURL('https://github.com/vigzmv/what_the_thing')}
               >
                 Github:/vigzmv/what_the_thing
               </Text>

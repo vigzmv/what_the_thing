@@ -1,7 +1,41 @@
 {
-  "extends": "airbnb",
+  "extends": [
+    "airbnb"
+  ],
+  "plugins": [
+    "import",
+    "react",
+    "jsx-a11y"
+  ],
+  "env": {
+    "browser": true,
+    "commonjs": true,
+    "es6": true,
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "sourceType": "module"
+  },
   "rules": {
-    "func-names": ["error", "never"],
-    "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "no-const-assign": "warn",
+    "no-this-before-super": "warn",
+    "no-undef": "warn",
+    "no-unreachable": "warn",
+    "no-unused-vars": "warn",
+    "constructor-super": "warn",
+    "valid-typeof": "warn",
+    "no-alert": 0,
+    "react/jsx-filename-extension": [
+      1,
+      {
+        "extensions": [
+          ".js",
+          ".jsx"
+        ]
+      }
+    ]
   }
 }
