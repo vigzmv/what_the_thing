@@ -47,17 +47,17 @@ module.exports = StyleSheet.create({
   },
 
   langs: {
-    height: Dimensions.get('window').height - 100,
-    width: Dimensions.get('window').width - 80,
+    height: Dimensions.get('window').height / 1.20,
+    width: Dimensions.get('window').width / 1.14,
     paddingBottom: 10,
   },
 
   infoBox: {
-    height: Dimensions.get('window').height - 480,
-    width: Dimensions.get('window').width - 100,
+    height: Dimensions.get('window').height / 2.7,
+    width: Dimensions.get('window').width / 1.2,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 30,
+    padding: 25,
   },
 
   infoText: {
@@ -67,7 +67,7 @@ module.exports = StyleSheet.create({
   listBoxes: {
     borderBottomWidth: 1,
     borderBottomColor: '#CFD8DC',
-    width: Dimensions.get('window').width - 90,
+    width: Dimensions.get('window').width / 1.15,
     justifyContent: 'center',
     alignItems: 'center',
   },
