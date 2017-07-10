@@ -25,7 +25,15 @@ It uses
 - [Clarifai's](https://clarifai.com/) concept recognition from images
 - [Yandex's](https://tech.yandex.com/translate/) language translation.
 
+
+## Download Signed Release for Android
+
+[what_the_thing_1.1.0-release.apk](https://github.com/vigzmv/what_the_thing/releases/tag/v1.1.0)
+
+
 ## Try it ?
+
+Get the signed release apk for android from [here](https://github.com/vigzmv/what_the_thing/releases/tag/v1.1.0) or follow the steps to build it yourself.
 
 Have a look at the [React-native Docs](https://facebook.github.io/react-native/docs/getting-started.html) to set up a development environment for React-native and Android.
 
