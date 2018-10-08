@@ -90,7 +90,7 @@ _I would be releasing a signed apk package soon which could be installed directl
 - Commit your changes
 - Submit a pull request
 
-Follow [Github Fow](https://help.github.com/articles/github-flow/) to collaborate!
+Follow [Github Flow](https://help.github.com/articles/github-flow/) to collaborate!
 
 ## Licence
 
