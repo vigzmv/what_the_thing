@@ -90,6 +90,8 @@ _I would be releasing a signed apk package soon which could be installed directl
 - Commit your changes
 - Submit a pull request
 
+Follow [Github Fow](https://help.github.com/articles/github-flow/) to collaborate!
+
 ## Licence
 
 [MIT Licence](https://github.com/vigzmv/what_the_thing/blob/master/LICENSE) © [Vignesh M](https://vigneshm.com)
