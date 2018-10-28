@@ -1,5 +1,7 @@
 import { StyleSheet, Dimensions } from 'react-native';
 
+windowDimensions = Dimensions.get('window');
+
 module.exports = StyleSheet.create({
 
   container: {
@@ -9,15 +11,15 @@ module.exports = StyleSheet.create({
   activityIcon: {
     alignItems: 'center',
     justifyContent: 'center',
-    top: Dimensions.get('window').height / 8,
+    top: windowDimensions.height / 8,
   },
 
   preview: {
     flex: 1,
     justifyContent: 'flex-end',
     alignItems: 'center',
-    height: Dimensions.get('window').height,
-    width: Dimensions.get('window').width,
+    height: windowDimensions.height,
+    width: windowDimensions.width,
   },
 
   cameraIco: {
@@ -47,14 +49,14 @@ module.exports = StyleSheet.create({
   },
 
   langs: {
-    height: Dimensions.get('window').height / 1.20,
-    width: Dimensions.get('window').width / 1.14,
+    height: windowDimensions.height / 1.20,
+    width: windowDimensions.width / 1.14,
     paddingBottom: 10,
   },
 
   infoBox: {
-    height: Dimensions.get('window').height / 2.7,
-    width: Dimensions.get('window').width / 1.2,
+    height: windowDimensions.height / 2.7,
+    width: windowDimensions.width / 1.2,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 25,
@@ -67,7 +69,7 @@ module.exports = StyleSheet.create({
   listBoxes: {
     borderBottomWidth: 1,
     borderBottomColor: '#CFD8DC',
-    width: Dimensions.get('window').width / 1.15,
+    width: windowDimensions.width / 1.15,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -80,7 +82,7 @@ module.exports = StyleSheet.create({
 
   Concept: {
     flex: 1,
-    top: Dimensions.get('window').height / 6,
+    top: windowDimensions.height / 6,
     alignItems: 'center',
   },
 
@@ -90,7 +92,7 @@ module.exports = StyleSheet.create({
   },
 
   enConceptText: {
-    bottom: Dimensions.get('window').height / 8,
+    bottom: windowDimensions.height / 8,
     fontSize: 38,
     color: 'white',
   },
